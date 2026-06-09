@@ -642,11 +642,12 @@ def get_news_sentiment(symbol: str):
         compound = scores["positive"] - scores["negative"]
         return scores, headlines, compound
     except Exception:
-        pos = np.random.uniform(0.3, 0.65)
-        neg = np.random.uniform(0.05, 0.25)
-        neu = 1 - pos - neg
-        compound = pos - neg
-        return {"positive": pos, "negative": neg, "neutral": neu}, headlines, compound
+        # FinBERT not installed — return neutral placeholder, clearly marked
+        return (
+            {"positive": 0.0, "negative": 0.0, "neutral": 0.0},
+            headlines,
+            0.0,
+        )
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -1225,6 +1226,11 @@ elif "Sentiment Monitor" in page:
     with st.spinner("🧠  Running FinBERT inference…"):
         scores, headlines, compound = get_news_sentiment(symbol)
 
+    # Detect fallback (all zeros = FinBERT not installed)
+    finbert_active = any(v > 0 for v in scores.values())
+    if not finbert_active:
+        st.warning("⚠️ **FinBERT not installed.** Sentiment scores are unavailable. Run `pip install transformers torch` and restart the app to enable live inference.", icon="🧠")
+
     col_gauge, col_bars = st.columns([1, 1.4])
 
     with col_gauge:
@@ -1263,7 +1269,7 @@ elif "Sentiment Monitor" in page:
         st.plotly_chart(fig_s, use_container_width=True)
 
     # Headlines timeline
-    st.markdown('<div class="section-header"><div class="section-accent"></div><div class="section-title">News Headlines</div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header"><div class="section-accent"></div><div class="section-title">Sample Headlines <span style="font-size:.75rem;color:#3d5a7a;font-weight:400;">(template-based · connect NewsAPI for live headlines)</span></div></div>', unsafe_allow_html=True)
     for i, h in enumerate(headlines):
         dot_cls = "green" if i % 3 == 0 else "red" if i % 3 == 1 else ""
         st.markdown(f"""
@@ -1296,12 +1302,43 @@ elif "Sentiment Monitor" in page:
 elif "Model Performance" in page:
     st.markdown('<div class="section-header"><div class="section-accent"></div><div class="section-title">Model Evaluation & Performance Metrics</div></div>', unsafe_allow_html=True)
 
-    # Metrics by segment (these are illustrative — replace with real eval results)
-    perf_data = {
-        "Large Cap":  {"accuracy": 0.67, "precision": 0.69, "recall": 0.65, "f1": 0.67, "auc": 0.72},
-        "Mid Cap":    {"accuracy": 0.63, "precision": 0.65, "recall": 0.61, "f1": 0.63, "auc": 0.68},
-        "Small Cap":  {"accuracy": 0.59, "precision": 0.61, "recall": 0.56, "f1": 0.58, "auc": 0.64},
-    }
+    # ── Try loading real metrics from model report ────────────────
+    report_path = "reports/model_report.csv"
+    real_metrics_loaded = False
+    perf_data = {}
+
+    if os.path.exists(report_path):
+        try:
+            rdf = pd.read_csv(report_path)
+            for _, row in rdf.iterrows():
+                name = str(row.get("Model","")).strip()
+                if not name or "Universal" in name:
+                    continue
+                seg_key = name.replace(" Cap","").strip() + " Cap"
+                perf_data[seg_key] = {
+                    "accuracy" : float(row.get("Accuracy",  0)),
+                    "precision": float(row.get("Precision", 0)),
+                    "recall"   : float(row.get("Recall",    0)),
+                    "f1"       : float(row.get("F1",        0)),
+                    "auc"      : float(row.get("ROC_AUC",   0)),
+                }
+            if perf_data:
+                real_metrics_loaded = True
+        except Exception:
+            pass
+
+    # Fallback to actual Phase 3 output values (honest results)
+    if not perf_data:
+        perf_data = {
+            "Large Cap": {"accuracy": 0.618, "precision": 0.379, "recall": 0.010, "f1": 0.019, "auc": 0.526},
+            "Mid Cap":   {"accuracy": 0.610, "precision": 0.429, "recall": 0.010, "f1": 0.019, "auc": 0.521},
+            "Small Cap": {"accuracy": 0.625, "precision": 0.500, "recall": 0.012, "f1": 0.023, "auc": 0.542},
+        }
+
+    if real_metrics_loaded:
+        st.success("✅ Metrics loaded from reports/model_report.csv", icon="📊")
+    else:
+        st.info("ℹ️ Showing actual Phase 3 evaluation results. Retrain with improved notebook to update.", icon="📋")
 
     cols = st.columns(3)
     for i, (seg, m) in enumerate(perf_data.items()):
