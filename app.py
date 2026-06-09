@@ -37,7 +37,7 @@ warnings.filterwarnings("ignore")
 # PAGE CONFIG  ──  must be the very first Streamlit call
 # ─────────────────────────────────────────────────────────────────────
 st.set_page_config(
-    page_title="StockSense AI — NSE Prediction Platform",
+    page_title="Stockify — NSE Prediction Platform",
     page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -804,11 +804,16 @@ with st.sidebar:
       <div style='font-family:Syne,sans-serif; font-size:1.3rem; font-weight:800;
                   background:linear-gradient(135deg,#ffffff,#00e5ff);
                   -webkit-background-clip:text; -webkit-text-fill-color:transparent;'>
-        📈 StockSense AI
+        📈 Stockify
       </div>
       <div style='font-family:JetBrains Mono,monospace; font-size:0.62rem;
                   letter-spacing:2px; color:#3d5a7a; margin-top:4px;'>
         NSE MULTI-CAP PLATFORM
+      </div>
+      <div style='font-family:Syne,sans-serif; font-size:0.72rem; font-weight:400;
+                  color:#00e5ff; margin-top:8px; letter-spacing:0.5px;
+                  font-style:italic; opacity:0.85;'>
+        Predict Smarter. Invest Better.
       </div>
     </div>
     <hr style='border-color:#1a2e4a; margin:0 0 1.2rem;'>
@@ -1445,7 +1450,7 @@ st.markdown("""
 <hr style='border-color:#1a2e4a;margin-top:3rem;margin-bottom:1.5rem;'>
 <div style='display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;
             font-family:JetBrains Mono,monospace;font-size:.62rem;color:#3d5a7a;padding-bottom:1rem;'>
-  <span>📈 StockSense AI · NSE Multi-Cap Prediction Platform</span>
+  <span>📈 Stockify · NSE Multi-Cap Prediction Platform</span>
   <span>XGBoost + FinBERT · 300+ Stocks · 18 Indicators</span>
   <span>⚠️ For Educational Use Only · Not Financial Advice</span>
 </div>
