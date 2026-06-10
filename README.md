@@ -256,7 +256,7 @@ Chronological Train/Test Split (80/20 by date — no shuffling)
 
 ## ⚠️ Disclaimer
 
-This project is developed **purely for academic and educational purposes** as part of a B.Tech Artificial Intelligence program. It does **not** constitute financial advice. Stock market trading involves significant risk of capital loss. Always consult a SEBI-registered investment advisor before making any investment decisions. Past model performance does not guarantee future results.
+This project is developed **purely for educational purpose**. It does **not** constitute financial advice. Stock market trading involves significant risk of capital loss. Always consult a SEBI-registered investment advisor before making any investment decisions. Past model performance does not guarantee future results.
 
 ---
 
